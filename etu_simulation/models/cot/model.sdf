@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<sdf version="1.4">
+   <model name="cot">
+   <pose>0 0 .10  0 0 0</pose>
+   <static>true</static>
+   <link name="body">
+   <collision name="body">
+     <geometry>
+       <mesh>
+          <uri>model://cot/meshes/cot.stl</uri>
+          <scale>.6 .6 .6</scale>
+       </mesh>
+     </geometry>
+   </collision>
+   <visual name="visual">
+     <geometry>
+       <mesh>
+          <uri>model://cot/meshes/cot.dae</uri>
+          <scale>.6 .6 .6</scale>
+       </mesh>
+     </geometry>
+   </visual>
+   </link>
+   </model>
+</sdf>

@@ -1,0 +1,14 @@
+<launch>
+
+  <arg name="robot" default="fetch"/>
+  <arg name="frame" default="world"/>
+
+  <node pkg="etu_simulation" name="amcl_pose_server" type="pose_server.py" />
+  <!-- <node pkg="etu_simulation" name="pose_observer" type="get_points.py" output="screen" launch-prefix="xterm -e"> -->
+  <node pkg="etu_simulation" name="pose_observer" type="get_points.py" output="screen" required="true">
+    <param name="poses_folder" value="$(find etu_simulation)/poses/etu_1" />
+    <param name="robot" value="$(arg robot)"/>
+    <param name="frame" value="$(arg frame)" />
+  </node>
+
+</launch>
