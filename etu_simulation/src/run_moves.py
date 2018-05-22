@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import rospy, yaml, rospkg, tf, actionlib, os, pickle
+import rospy, yaml, rospkg, tf, actionlib, os, pickle, random
 from rospy_message_converter import message_converter
 from geometry_msgs.msg import Pose, PoseStamped, PoseWithCovarianceStamped, PoseWithCovariance, Twist
 from gazebo_msgs.msg import ModelState
@@ -26,7 +26,7 @@ class Simulator:
             self.a_frame = rospy.get_param('simulator/amcl_frame')
             self.results_folder = rospy.get_param('simulator/results_folder')
         except KeyError:
-            print("keyerror")
+            # print("keyerror")
             rospy.logerr("simlulator has crashed: parameters are not set")
 
         # Setup some variables we need
@@ -89,35 +89,36 @@ class Simulator:
     def simulate(self):
         num = len(self.locations)
         data = None
+        random.seed(rospy.get_time())
         # Let's run some tests
-        rospy.loginfo("got to simulate")
-        for t in range(1000):
-            for i in range(0,num):
-                for j in range(0,num):
-                    if i == j:
-                        continue
-                    self.stopped = False
-                    # Try to set the starting point and localize
-                    attempts = 0
-                    localized = True
-                    while(self.set_start(self.locations[i])):
-                        attempts  = attempts + 1
-                        if attempts > 2: # cannot localize here, even after reset
-                            localized = False
-                            break
-                    if not localized:
-                        data = [self.locations[i],self.locations[j],'localization_error']
-                    else:
-                        self.clear_costmaps()
-                        rospy.sleep(2)
-                        self.start_time = rospy.get_time()
-                        self.send_goal.send_goal(self.make_goal(self.locations[j]))
-                        path = []
-                        while(not self.stopped):
-                            path.append(self.get_amcl_pose().msg.pose.pose)
-                            rospy.sleep(1)
-                        data = [self.move_result,self.stop_time - self.start_time, path]
-                        self.write_data(self.locations[i],self.locations[j],data)
+        # rospy.loginfo("got to simulate")
+        for t in range(1):
+            i = random.choice(range(0,num))
+            j = random.choice(range(0,num))
+            if i == j:
+                continue
+            self.stopped = False
+            # Try to set the starting point and localize
+            attempts = 0
+            localized = True
+            while(self.set_start(self.locations[i])):
+                attempts  = attempts + 1
+                if attempts > 2: # cannot localize here, even after reset
+                    localized = False
+                    break
+            if not localized:
+                data = [self.locations[i],self.locations[j],'localization_error']
+            else:
+                self.clear_costmaps()
+                rospy.sleep(2)
+                self.start_time = rospy.get_time()
+                self.send_goal.send_goal(self.make_goal(self.locations[j]))
+                path = []
+                while(not self.stopped):
+                    path.append(self.get_amcl_pose().msg.pose.pose)
+                    rospy.sleep(1)
+                data = [self.move_result,self.stop_time - self.start_time, path]
+                self.write_data(self.locations[i],self.locations[j],data)
         rospy.signal_shutdown(0)
 
     def write_data(self,start,stop,data):
@@ -174,7 +175,7 @@ class Simulator:
         self.stopped = True
 
     def set_start(self,location):
-        rospy.loginfo("got to set_start")
+        # rospy.loginfo("got to set_start")
         zero_twist = Twist()
         gazebo_state = ModelState()
         zero_twist.linear.x = 0.0
@@ -217,7 +218,7 @@ class Simulator:
     # Get the amcl and gazebo poses by the name from the loaded file.
     def _amcl_pose(self,location):
         pose = PoseWithCovariance()
-        print(self.a_locations[location])
+        # print(self.a_locations[location])
         pose.pose.position = message_converter.convert_dictionary_to_ros_message('geometry_msgs/Point',self.a_locations[location]['position'])
         pose.pose.orientation = message_converter.convert_dictionary_to_ros_message('geometry_msgs/Quaternion',self.a_locations[location]['orientation'])
         pose.covariance = self.a_locations[location]['covariance']

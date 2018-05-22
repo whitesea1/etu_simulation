@@ -27,14 +27,14 @@
 
   <!-- <include file="$(find etu_simulation)/launch/include/turtle.launch.xml" /> -->
 
-  <node name="$(anon rviz)" pkg="rviz" type="rviz" required="true"
+  <!-- <node name="$(anon rviz)" pkg="rviz" type="rviz" required="true"
      respawn="false" output="screen" args="$(arg rviz_args)">
-  </node>
+  </node> -->
   <!-- Get out pose server running -->
   <node pkg="etu_simulation" name="amcl_pose_server" type="pose_server.py" />
 
   <!-- run some tests -->
-  <node name="simulator" pkg='etu_simulation' type="run_moves.py" required='true' output="screen">
+  <node name="simulator" pkg='etu_simulation' type="run_moves.py" required='true'>
     <param name="gazebo_goals" value="$(find etu_simulation)/poses/$(arg world)/gazebo_poses.yaml" />
     <param name="amcl_goals" value="$(find etu_simulation)/poses/$(arg world)/amcl_poses.yaml" />
     <param name="robot" value="$(arg robot)" />
