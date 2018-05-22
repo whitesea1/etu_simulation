@@ -92,7 +92,7 @@ class Simulator:
         random.seed(rospy.get_time())
         # Let's run some tests
         # rospy.loginfo("got to simulate")
-        for t in range(1):
+        for t in range(50):
             i = random.choice(range(0,num))
             j = random.choice(range(0,num))
             if i == j:
